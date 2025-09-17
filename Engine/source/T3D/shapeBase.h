@@ -915,7 +915,8 @@ protected:
    String            mAppliedSkinName;
 
    NetStringHandle mShapeNameHandle;   ///< Name sent to client
-   /// @}
+   NetStringHandle mShapeIconHandle;
+/// @}
 
    /// @name Physical Properties
    /// @{
@@ -989,7 +990,7 @@ protected:
    /// @}
  protected:
 
-	S32 mTeam; //Phantom139: Added
+   S32 mTeam;
    /// @name Damage
    /// @{
    F32  mDamage;
@@ -1184,13 +1185,12 @@ public:
    ///
    enum ShapeBaseMasks {
       NameMask        = Parent::NextFreeMask,
-      TeamMask 		 = Parent::NextFreeMask << 1,
-		DamageMask      = Parent::NextFreeMask << 2,
-      NoWarpMask      = Parent::NextFreeMask << 3,
-      CloakMask       = Parent::NextFreeMask << 4,
-      SkinMask        = Parent::NextFreeMask << 5,
-      MeshHiddenMask  = Parent::NextFreeMask << 6,
-      SoundMaskN      = Parent::NextFreeMask << 7,       ///< Extends + MaxSoundThreads bits
+      DamageMask      = Parent::NextFreeMask << 1,
+      NoWarpMask      = Parent::NextFreeMask << 2,
+      CloakMask       = Parent::NextFreeMask << 3,
+      SkinMask        = Parent::NextFreeMask << 4,
+      MeshHiddenMask  = Parent::NextFreeMask << 5,
+      SoundMaskN      = Parent::NextFreeMask << 6,       ///< Extends + MaxSoundThreads bits
       ThreadMaskN     = SoundMaskN  << MaxSoundThreads,  ///< Extends + MaxScriptThreads bits
       ImageMaskN      = ThreadMaskN << MaxScriptThreads, ///< Extends + MaxMountedImage bits
       NextFreeMask    = ImageMaskN  << MaxMountedImages
@@ -1229,6 +1229,9 @@ public:
    void setSkinName(const char*);
    const char* getSkinName();
    /// @}
+
+   void setShapeIcon(const char*);
+   const char* getShapeIcon();
 
    /// @name Mesh Visibility
    /// @{
@@ -1889,8 +1892,8 @@ public:
    void setTransform(const MatrixF & mat) override;
    F32 getMass() const override { return mMass; }
 
-	virtual S32 getTeam() { return mTeam; }
-	void setTeam(S32 newt) { mTeam = newt; setMaskBits(TeamMask); }
+   virtual S32 getTeam() { return mTeam; }
+   void setTeam(S32 newt) { mTeam = newt; }
 
    /// @name Network
    /// @{
@@ -1992,6 +1995,10 @@ inline WaterObject* ShapeBase::getCurrentWaterObject()
       return mShapeBaseMount->getCurrentWaterObject();
 
    return mCurrentWaterObject;
+}
+
+inline const char* ShapeBase::getShapeIcon() {
+   return mShapeIconHandle.getString();
 }
 
 #endif  // _H_SHAPEBASE_

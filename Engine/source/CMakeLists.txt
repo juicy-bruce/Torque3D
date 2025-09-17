@@ -102,6 +102,10 @@ torqueAddSourceDirectories("core" "core/stream" "core/strings" "core/util"
 torqueAddSourceDirectories("gui" "gui/buttons" "gui/containers" "gui/controls" "gui/core"
                               "gui/game" "gui/shiny" "gui/utility" "gui/3d")
 
+# Add AFPSK sources
+
+torqueAddSourceDirectories("PGD" "PGD/AFPSK")
+
 # Handle postFX
 torqueAddSourceDirectories("postFx")
 

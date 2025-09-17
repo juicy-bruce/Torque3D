@@ -3266,15 +3266,10 @@ U32 ShapeBase::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          else
             stream->writeFlag(mFadeVal == 1.0f);
       }
-
-      if (stream->writeFlag(mask & TeamMask)) {
-         // Phantom: team
-         stream->write( mTeam );
-         //Phantom139: Done
-      }
-
       if (stream->writeFlag(mask & NameMask)) {
+         stream->write( mTeam );
          con->packNetStringHandleU(stream, mShapeNameHandle);
+         con->packNetStringHandleU(stream, mShapeIconHandle);
       }
 
       if ( stream->writeFlag( mask & MeshHiddenMask ) )
@@ -3489,15 +3484,10 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
          else
             mFadeVal = F32(stream->readFlag());
       }
-
-      if (stream->readFlag()) { // TeamMask
-         //Phantom: Added Team
-         stream->read(&mTeam);
-         //Phantom139: End
-      }
-
       if (stream->readFlag())  { // NameMask
+         stream->read(&mTeam);
          mShapeNameHandle = con->unpackNetStringHandleU(stream);
+         mShapeIconHandle = con->unpackNetStringHandleU(stream);
       }
 
       if ( stream->readFlag() ) // MeshHiddenMask
@@ -3734,6 +3724,25 @@ void ShapeBase::startFade( F32 fadeTime, F32 fadeDelay, bool fadeOut )
 }
 
 //--------------------------------------------------------------------------
+
+void ShapeBase::setShapeIcon(const char* name) {
+   if (!isGhost()) {
+      if (name[0] != '\0') {
+         // Use tags for better network performance
+         // Should be a tag, but we'll convert to one if it isn't.
+         if (name[0] == StringTagPrefixByte) {
+            mShapeIconHandle = NetStringHandle(U32(dAtoi(name + 1)));
+         }
+         else {
+            mShapeIconHandle = NetStringHandle(name);
+         }
+      }
+      else {
+         mShapeIconHandle = NetStringHandle();
+      }
+      setMaskBits(NameMask);
+   }
+}
 
 void ShapeBase::setShapeName(const char* name)
 {
@@ -4973,6 +4982,23 @@ DefineEngineMethod( ShapeBase, getShapeName, const char*, (),,
    return object->getShapeName();
 }
 
+DefineEngineMethod( ShapeBase, setShapeIcon, void, ( const char* name ),,
+"@brief Set the icon name of this shape.\n\n"
+"@note This is used by the Advanced Radar GUI, use \t to separate special cases (IE: Players).\n"
+"@param name new icon name for the shape\n\n"
+"@see getShapeIcon()\n")
+{
+   object->setShapeIcon( name );
+}
+DefineEngineMethod( ShapeBase, getShapeIcon, const char*, (),,
+"@brief Get the name of the shape.\n\n"
+"@note This is used by the Advanced Radar GUI, use \t to separate special cases (IE: Players).\n"
+"@return the icon name of the shape\n\n"
+"@see setShapeIcon()\n")
+{
+   return object->getShapeIcon();
+}
+
 DefineEngineMethod( ShapeBase, setSkinName, void, ( const char* name ),,
    "@brief Apply a new skin to this shape.\n\n"
 
@@ -5529,7 +5555,6 @@ DefineEngineMethod(ShapeBase, getAIController, AIController*, (), , "")
    return object->getAIController();
 }
 
-//Phantom: Added Team Methods:
 DefineEngineMethod( ShapeBase, getTeam, S32, (),,
 "@brief Get the current team number used by this shape.\n\n"
 "@return the team number\n\n") {
