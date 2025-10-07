@@ -17,7 +17,7 @@
 //Phantom: Set to "1" to allow the console to print specific errors. This is mainly a debug tool that should only be used
 // To hunt down C++ issues of the radar. If you're sending invalid names via NARC events, that is not a reason to use this.
 // You have been warned, this will output A LOT of stuff to the console.
-#define _LOG_ERRORS 0
+#define _LOG_ERRORS 1
 // _UAV_LINES is a render counter of how many lines will be rendered in a "sweep"
 #define _UAV_LINES 20
 
